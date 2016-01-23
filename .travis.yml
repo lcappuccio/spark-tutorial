@@ -1,8 +1,13 @@
-sudo: false
+sudo: required
 language: java
 
 jdk:
   - oraclejdk8
+
+before_install:
+  - sudo rm /etc/mavenrc
+  - export M2_HOME=/usr/local/maven
+  - export MAVEN_OPTS="-Dmaven.repo.local=$HOME/.m2/repository -Xms2048m -Xmx4096m -XX:PermSize=512m"
 
 before_script:
   - pip install --user codecov
