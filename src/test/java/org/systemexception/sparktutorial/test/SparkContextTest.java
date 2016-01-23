@@ -1,8 +1,12 @@
 package org.systemexception.sparktutorial.test;
 
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.systemexception.sparktutorial.pojo.SparkContext;
+
+import java.io.File;
+import java.net.URL;
+import java.time.LocalDateTime;
 
 import static junit.framework.TestCase.assertTrue;
 
@@ -12,10 +16,10 @@ import static junit.framework.TestCase.assertTrue;
  */
 public class SparkContextTest {
 
-	private SparkContext sut;
+	private static SparkContext sut;
 
-	@After
-	public void tearDown() {
+	@AfterClass
+	public static void tearDown() {
 		sut.getSparkContext().close();
 	}
 
@@ -25,6 +29,19 @@ public class SparkContextTest {
 
 		assertTrue(sut != null);
 		assertTrue(sut.getSparkContext() != null);
+	}
+
+	@Test
+	public void sut_processes_file() {
+		URL url = this.getClass().getResource("/lorem_ipsum.txt");
+		File testFile = new File(url.getFile());
+
+		assertTrue(testFile.exists());
+
+		String test_output_folder = "target" + File.separator + LocalDateTime.now().toString() + "_test_output";
+		sut.processFile(testFile.getAbsolutePath(), test_output_folder);
+
+		assertTrue(new File(test_output_folder).exists());
 	}
 
 }
