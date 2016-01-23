@@ -1,5 +1,6 @@
 package org.systemexception.sparktutorial.test;
 
+import org.junit.After;
 import org.junit.Test;
 import org.systemexception.sparktutorial.main.SparkContext;
 
@@ -12,6 +13,11 @@ import static junit.framework.TestCase.assertTrue;
 public class SparkContextTest {
 
 	private SparkContext sut;
+
+	@After
+	public void tearDown() {
+		sut.getSparkContext().close();
+	}
 
 	@Test
 	public void sut_exists() {
