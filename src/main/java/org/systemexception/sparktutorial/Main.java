@@ -1,4 +1,4 @@
-package org.systemexception.sparktutorial.main;
+package org.systemexception.sparktutorial;
 
 /**
  * @author leo
