@@ -2,7 +2,7 @@ package org.systemexception.sparktutorial.test;
 
 import org.junit.After;
 import org.junit.Test;
-import org.systemexception.sparktutorial.main.SparkContext;
+import org.systemexception.sparktutorial.pojo.SparkContext;
 
 import static junit.framework.TestCase.assertTrue;
 

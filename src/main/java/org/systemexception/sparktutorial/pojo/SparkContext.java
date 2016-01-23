@@ -1,4 +1,4 @@
-package org.systemexception.sparktutorial.main;
+package org.systemexception.sparktutorial.pojo;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
