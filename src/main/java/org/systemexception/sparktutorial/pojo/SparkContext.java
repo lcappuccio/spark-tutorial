@@ -4,6 +4,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.slf4j.Logger;
 import scala.Tuple2;
 
 import java.util.Arrays;
@@ -16,10 +17,12 @@ public class SparkContext {
 
 	private final SparkConf sparkConf;
 	private final JavaSparkContext sparkContext;
+	private final Logger logger;
 
 	public SparkContext() {
 		sparkConf = new SparkConf().setAppName("org.systemexception.sparktutorial").setMaster("local");
 		sparkContext = new JavaSparkContext(sparkConf);
+		logger = sparkConf.log();
 	}
 
 	public JavaSparkContext getSparkContext() {
@@ -27,6 +30,7 @@ public class SparkContext {
 	}
 
 	public void processFile(String fileName, String outputFolder) {
+		logger.info("Start processing...");
 		// Load the input data, which is a text file read from the command line
 		JavaRDD<String> input = sparkContext.textFile(fileName);
 
@@ -38,5 +42,6 @@ public class SparkContext {
 
 		// Save the word count back out to a text file, causing evaluation.
 		counts.saveAsTextFile(outputFolder);
+		logger.info("End processing");
 	}
 }
