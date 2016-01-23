@@ -9,9 +9,13 @@ import org.apache.spark.api.java.JavaSparkContext;
  */
 public class SparkContext {
 
-	private static final SparkConf sparkConf = new SparkConf().setAppName("org.systemexception.sparktutorial")
-			.setMaster("local");
-	private static final JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
+	private final SparkConf sparkConf;
+	private final JavaSparkContext sparkContext;
+
+	public SparkContext() {
+		sparkConf = new SparkConf().setAppName("org.systemexception.sparktutorial").setMaster("local");
+		sparkContext = new JavaSparkContext(sparkConf);
+	}
 
 	public JavaSparkContext getSparkContext() {
 		return sparkContext;
