@@ -1,6 +1,7 @@
 package org.systemexception.sparktutorial.test;
 
 import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.systemexception.sparktutorial.pojo.SparkContext;
 
@@ -26,17 +27,17 @@ public class SparkContextTest {
 
 	private static SparkContext sut;
 
-	@AfterClass
-	public static void tearDown() {
-		sut.getSparkContext().close();
-	}
-
-	@Test
-	public void sut_exists() {
+	@BeforeClass
+	public static void setUp() {
 		sut = new SparkContext();
 
 		assertTrue(sut != null);
 		assertTrue(sut.getSparkContext() != null);
+	}
+
+	@AfterClass
+	public static void tearDown() {
+		sut.getSparkContext().close();
 	}
 
 	@Test
