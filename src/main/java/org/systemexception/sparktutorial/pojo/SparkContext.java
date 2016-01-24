@@ -7,7 +7,9 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import scala.Tuple2;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author leo
@@ -27,7 +29,7 @@ public class SparkContext {
 		return sparkContext;
 	}
 
-	public void processFile(String fileName, String outputFolder) {
+	public void countWords(String fileName, String outputFolder) {
 		// Load the input data, which is a text file read from the command line
 		JavaRDD<String> input = sparkContext.textFile(fileName);
 
@@ -36,6 +38,28 @@ public class SparkContext {
 
 		// Java 8 with lambdas: transform the collection of words into pairs (word and 1) and then count them
 		JavaPairRDD<String, Integer> counts = words.mapToPair(t -> new Tuple2(t, 1)).reduceByKey((x, y) ->
+				(int) x + (int) y);
+
+		// Save the word count back out to a text file, causing evaluation.
+		counts.saveAsTextFile(outputFolder);
+	}
+
+	public void countChars(String fileName, String outputFolder) {
+		// Load the input data, which is a text file read from the command line
+		JavaRDD<String> input = sparkContext.textFile(fileName);
+
+		// Java 8 with lambdas: split the input string into chars
+		List<String> fileContent = input.collect();
+		List<String> stringBuffer = new ArrayList<>();
+		for (String fileLine: fileContent) {
+			for (char fileChar: fileLine.toCharArray()) {
+				stringBuffer.add(String.valueOf(fileChar));
+			}
+		}
+		JavaRDD<String> chars = sparkContext.parallelize(stringBuffer);
+
+		// Java 8 with lambdas: transform the collection of chars into pairs (word and 1) and then count them
+		JavaPairRDD<String, Integer> counts = chars.mapToPair(t -> new Tuple2(t, 1)).reduceByKey((x, y) ->
 				(int) x + (int) y);
 
 		// Save the word count back out to a text file, causing evaluation.
