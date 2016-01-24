@@ -40,7 +40,7 @@ public class SparkContextTest {
 	}
 
 	@Test
-	public void sut_count_words() {
+	public void sut_count_words() throws IOException {
 		URL url = this.getClass().getResource("/test_file.txt");
 		File testFile = new File(url.getFile());
 
@@ -51,6 +51,11 @@ public class SparkContextTest {
 		sut.countWords(testFile.getAbsolutePath(), test_output_folder);
 
 		assertTrue(new File(test_output_folder).exists());
+		String output = Arrays.toString(readOutputFile(test_output_folder).toArray());
+		assertTrue(output.contains("(aaaa,1)"));
+		assertTrue(output.contains("(bbb,1)"));
+		assertTrue(output.contains("(cc,1)"));
+		assertTrue(output.contains("(d,2)"));
 	}
 
 	@Test
@@ -69,7 +74,7 @@ public class SparkContextTest {
 		assertTrue(output.contains("(a,4)"));
 		assertTrue(output.contains("(b,3)"));
 		assertTrue(output.contains("(c,2)"));
-		assertTrue(output.contains("(d,1)"));
+		assertTrue(output.contains("(d,2)"));
 	}
 
 	private String convertTime(long time) {
