@@ -46,10 +46,7 @@ public class SparkContext {
 	}
 
 	public void countChars(String fileName, String outputFolder) {
-		// Load the input data, which is a text file read from the command line
 		JavaRDD<String> input = sparkContext.textFile(fileName);
-
-		// Java 8 with lambdas: split the input string into chars
 		List<String> fileContent = input.collect();
 		List<String> stringBuffer = new ArrayList<>();
 		for (String fileLine: fileContent) {
@@ -58,12 +55,8 @@ public class SparkContext {
 			}
 		}
 		JavaRDD<String> chars = sparkContext.parallelize(stringBuffer);
-
-		// Java 8 with lambdas: transform the collection of chars into pairs (word and 1) and then count them
 		JavaPairRDD<String, Integer> counts = chars.mapToPair(t -> new Tuple2(t, 1))
 				.reduceByKey((x, y) -> (int) x + (int) y);
-
-		// Save the word count back out to a text file, causing evaluation.
 		counts.saveAsTextFile(outputFolder);
 	}
 
