@@ -1,6 +1,7 @@
 package org.systemexception.sparktutorial.test;
 
 import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.systemexception.sparktutorial.pojo.SparkContext;
 
@@ -26,17 +27,17 @@ public class SparkContextTest {
 
 	private static SparkContext sut;
 
-	@AfterClass
-	public static void tearDown() {
-		sut.getSparkContext().close();
-	}
-
-	@Test
-	public void sut_exists() {
+	@BeforeClass
+	public static void setUp() {
 		sut = new SparkContext();
 
 		assertTrue(sut != null);
 		assertTrue(sut.getSparkContext() != null);
+	}
+
+	@AfterClass
+	public static void tearDown() {
+		sut.getSparkContext().close();
 	}
 
 	@Test
@@ -75,6 +76,22 @@ public class SparkContextTest {
 		assertTrue(output.contains("(b,3)"));
 		assertTrue(output.contains("(c,2)"));
 		assertTrue(output.contains("(d,2)"));
+	}
+
+	@Test
+	public void sut_filter_lines() throws IOException {
+		URL url = this.getClass().getResource("/test_file.txt");
+		File testFile = new File(url.getFile());
+
+		assertTrue(testFile.exists());
+
+		String test_output_folder = "target" + File.separator + convertTime(System.currentTimeMillis())
+				+ "_filter_output";
+		sut.filterFile(testFile.getAbsolutePath(), test_output_folder, "aaaa");
+
+		String output = Arrays.toString(readOutputFile(test_output_folder).toArray());
+		assertTrue(new File(test_output_folder).exists());
+		assertTrue("[aaaa]".equals(output));
 	}
 
 	private String convertTime(long time) {
