@@ -78,6 +78,22 @@ public class SparkContextTest {
 		assertTrue(output.contains("(d,2)"));
 	}
 
+	@Test
+	public void sut_filter_lines() throws IOException {
+		URL url = this.getClass().getResource("/test_file.txt");
+		File testFile = new File(url.getFile());
+
+		assertTrue(testFile.exists());
+
+		String test_output_folder = "target" + File.separator + convertTime(System.currentTimeMillis())
+				+ "_filter_output";
+		sut.filterFile(testFile.getAbsolutePath(), test_output_folder, "aaaa");
+
+		String output = Arrays.toString(readOutputFile(test_output_folder).toArray());
+		assertTrue(new File(test_output_folder).exists());
+		assertTrue("[aaaa]".equals(output));
+	}
+
 	private String convertTime(long time) {
 		Date date = new Date(time);
 		Format format = new SimpleDateFormat("yyyyMMddHHmmss");

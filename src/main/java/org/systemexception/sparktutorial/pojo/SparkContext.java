@@ -66,4 +66,10 @@ public class SparkContext {
 		// Save the word count back out to a text file, causing evaluation.
 		counts.saveAsTextFile(outputFolder);
 	}
+
+	public void filterFile(String fileName, String outputFolder, String textToFilter) {
+		JavaRDD<String> input = sparkContext.textFile(fileName);
+		JavaRDD<String> filteredLines = input.filter(s -> s.contains(textToFilter));
+		filteredLines.saveAsTextFile(outputFolder);
+	}
 }
