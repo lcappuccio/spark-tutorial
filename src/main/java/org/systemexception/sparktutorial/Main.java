@@ -27,5 +27,8 @@ public class Main {
 		for (String word: words.collect()) {
 			System.out.println(word);
 		}
+
+		Integer reduced = ints.reduce((x, y) -> x + y);
+		System.out.println(reduced);
 	}
 }
