@@ -1,5 +1,6 @@
 package org.systemexception.sparktutorial;
 
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.slf4j.Logger;
@@ -38,5 +39,9 @@ public class Main {
 		logger.info("Reduce Integers");
 		Integer reduced = ints.reduce((x, y) -> x + y);
 		logger.info("Reduced: " + reduced);
+
+		logger.info("Map to pair");
+		JavaPairRDD<String, Long> pairRDD = strings.zipWithIndex();
+		logger.info("Paired: " + pairRDD.collect());
 	}
 }
