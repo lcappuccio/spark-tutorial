@@ -41,7 +41,10 @@ public class Main {
 		logger.info("Reduced: " + reduced);
 
 		logger.info("Map to pair");
-		JavaPairRDD<String, Long> pairRDD = strings.zipWithIndex();
+		// Not really optimal as keys and values are flipped :/
+		JavaPairRDD<String, Long> pairRDD = strings.zipWithUniqueId();
 		logger.info("Paired: " + pairRDD.collect());
+		JavaPairRDD<String, Long> filteredPairRDD = pairRDD.filter(t -> t._1.contains("Hello"));
+		logger.info("Paired filtered: " + filteredPairRDD.collect());
 	}
 }
