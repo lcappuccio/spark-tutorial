@@ -6,6 +6,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.systemexception.sparktutorial.pojo.SparkContext;
+import scala.Tuple2;
 
 import java.util.Arrays;
 
@@ -41,10 +42,10 @@ public class Main {
 		logger.info("Reduced: " + reduced);
 
 		logger.info("Map to pair");
-		// Not really optimal as keys and values are flipped :/
-		JavaPairRDD<String, Long> pairRDD = strings.zipWithUniqueId();
+		JavaPairRDD<Long, String> pairRDD = sc.parallelizePairs(Arrays.asList(
+				new Tuple2(1,"Hello World"), new Tuple2(2,"Goodbye World")));
 		logger.info("Paired: " + pairRDD.collect());
-		JavaPairRDD<String, Long> filteredPairRDD = pairRDD.filter(t -> t._1.contains("Hello"));
+		JavaPairRDD<Long, String> filteredPairRDD = pairRDD.filter(t -> t._2.contains("Hello"));
 		logger.info("Paired filtered: " + filteredPairRDD.collect());
 	}
 }
