@@ -21,8 +21,7 @@ public class SparkContext {
 
 	public SparkContext() {
 		SparkConf sparkConf = new SparkConf().setAppName("org.systemexception.sparktutorial").setMaster("local");
-		PropertyConfigurator.configure(Thread.currentThread().getContextClassLoader()
-				.getResource("spark_log4j.properties"));
+		PropertyConfigurator.configure(JavaSparkContext.class.getClassLoader().getResource("log4j.properties"));
 		sparkContext = new JavaSparkContext(sparkConf);
 	}
 
