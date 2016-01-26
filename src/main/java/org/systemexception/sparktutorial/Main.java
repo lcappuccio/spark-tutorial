@@ -3,6 +3,8 @@ package org.systemexception.sparktutorial;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.Function2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.systemexception.sparktutorial.pojo.SparkContext;
@@ -47,5 +49,20 @@ public class Main {
 		logger.info("Paired: " + pairRDD.collect());
 		JavaPairRDD<Long, String> filteredPairRDD = pairRDD.filter(t -> t._2.contains("Hello"));
 		logger.info("Paired filtered: " + filteredPairRDD.collect());
+
+		logger.info("Map to pair and reduce");
+		JavaPairRDD<String, Long> simpsonsPair = sc.parallelizePairs(Arrays.asList(
+				new Tuple2("Homer", 1L), new Tuple2("Marge", 3L), new Tuple2("Homer", 4L),
+				new Tuple2("Bart", 1L), new Tuple2("Lisa", 5L), new Tuple2("Bart", 3L)));
+		JavaPairRDD<String, Tuple2<Long, Long>> simpsonsMapValued = simpsonsPair.mapValues(
+				(Function<Long, Tuple2<Long, Long>>) aLong -> new Tuple2(aLong, 1L)
+		);
+		logger.info("Paired and mapped: " + simpsonsMapValued.collect());
+		logger.info("Reduce by key");
+		JavaPairRDD<String, Tuple2<Long, Long>> simponsMapReduced = simpsonsMapValued.reduceByKey(
+				(Function2<Tuple2<Long, Long>, Tuple2<Long, Long>, Tuple2<Long, Long>>) (longLongTupleX, longLongTupleY)
+						-> new Tuple2<>(longLongTupleX._1 + longLongTupleY._1, longLongTupleX._2 + longLongTupleY._2)
+		);
+		logger.info("Reduced by key: " + simponsMapReduced.collect());
 	}
 }
