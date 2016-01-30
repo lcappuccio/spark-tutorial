@@ -95,6 +95,7 @@ public class Main {
 		JavaRDD hashMapRdd = sc.parallelize(Arrays.asList(hashMap.keySet().toArray()));
 		JavaPairRDD hashMapPairRdd = hashMapRdd.mapToPair(s -> new Tuple2(s, hashMap.get(s)))
 				.partitionBy(new HashPartitioner(100)).persist(StorageLevel.MEMORY_ONLY());
-		logger.info("Hashmap to PairRDD: " + hashMapPairRdd.collect());
+		logger.info("Hashmap to partitioned PairRDD: " + hashMapPairRdd.collect());
+		logger.info("Hashmap partitions: " + hashMapPairRdd.partitions().size());
 	}
 }
