@@ -76,5 +76,11 @@ public class Main {
 		logger.info("Customer right join purchases: " + customerRightOuterPurchases.collect());
 		JavaPairRDD customerLeftOuterPurchases = customers.leftOuterJoin(customerPurchases);
 		logger.info("Customer left join purchases: " + customerLeftOuterPurchases.collect());
+
+		JavaPairRDD unsortedData = sc.parallelizePairs(Arrays.asList(
+				new Tuple2("D","Data4"), new Tuple2("A", "Data1"), new Tuple2("C", "Data3"), new Tuple2("B", "Data2")));
+		logger.info("Unsorted data: " + unsortedData.collect());
+		JavaPairRDD sortedData = unsortedData.sortByKey();
+		logger.info("Sorted data: " + sortedData.collect());
 	}
 }
