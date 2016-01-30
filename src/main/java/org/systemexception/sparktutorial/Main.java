@@ -64,5 +64,23 @@ public class Main {
 						-> new Tuple2<>(longLongTupleX._1 + longLongTupleY._1, longLongTupleX._2 + longLongTupleY._2)
 		);
 		logger.info("Reduced by key: " + simponsMapReduced.collect());
+
+		logger.info("Join customers and purchases");
+		JavaPairRDD customers = sc.parallelizePairs(Arrays.asList(
+				new Tuple2("AAA", "Homer Simpson"), new Tuple2("AAB", "Marge Simspon"),
+				new Tuple2("AAC", "Ned Flanders"), new Tuple2("AAD", "Lenny Leonard")));
+		JavaPairRDD purchases = sc.parallelizePairs(Arrays.asList(new Tuple2("AAA", 1000L), new Tuple2("AAD", 2000L)));
+		JavaPairRDD customerPurchases = customers.join(purchases);
+		logger.info("Customer join purchases: " + customerPurchases.collect());
+		JavaPairRDD customerRightOuterPurchases = customers.rightOuterJoin(customerPurchases);
+		logger.info("Customer right join purchases: " + customerRightOuterPurchases.collect());
+		JavaPairRDD customerLeftOuterPurchases = customers.leftOuterJoin(customerPurchases);
+		logger.info("Customer left join purchases: " + customerLeftOuterPurchases.collect());
+
+		JavaPairRDD unsortedData = sc.parallelizePairs(Arrays.asList(
+				new Tuple2("D","Data4"), new Tuple2("A", "Data1"), new Tuple2("C", "Data3"), new Tuple2("B", "Data2")));
+		logger.info("Unsorted data: " + unsortedData.collect());
+		JavaPairRDD sortedData = unsortedData.sortByKey();
+		logger.info("Sorted data: " + sortedData.collect());
 	}
 }
