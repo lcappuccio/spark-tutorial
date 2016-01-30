@@ -6,6 +6,7 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
+import org.apache.spark.storage.StorageLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.systemexception.sparktutorial.pojo.SparkContext;
@@ -93,7 +94,7 @@ public class Main {
 		}
 		JavaRDD hashMapRdd = sc.parallelize(Arrays.asList(hashMap.keySet().toArray()));
 		JavaPairRDD hashMapPairRdd = hashMapRdd.mapToPair(s -> new Tuple2(s, hashMap.get(s)))
-				.partitionBy(new HashPartitioner(100));
+				.partitionBy(new HashPartitioner(100)).persist(StorageLevel.MEMORY_ONLY());
 		logger.info("Hashmap to PairRDD: " + hashMapPairRdd.collect());
 	}
 }
