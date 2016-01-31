@@ -1,16 +1,20 @@
 package org.systemexception.sparktutorial;
 
+import org.apache.spark.HashPartitioner;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
+import org.apache.spark.storage.StorageLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.systemexception.sparktutorial.pojo.SparkContext;
 import scala.Tuple2;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * @author leo
@@ -82,5 +86,16 @@ public class Main {
 		logger.info("Unsorted data: " + unsortedData.collect());
 		JavaPairRDD sortedData = unsortedData.sortByKey();
 		logger.info("Sorted data: " + sortedData.collect());
+
+		logger.info("Partition and persist");
+		HashMap hashMap = new HashMap();
+		for (int i = 0; i < 1000; i++) {
+			hashMap.put(i, UUID.randomUUID().toString());
+		}
+		JavaRDD hashMapRdd = sc.parallelize(Arrays.asList(hashMap.keySet().toArray()));
+		JavaPairRDD hashMapPairRdd = hashMapRdd.mapToPair(s -> new Tuple2(s, hashMap.get(s)))
+				.partitionBy(new HashPartitioner(100)).persist(StorageLevel.MEMORY_ONLY());
+		logger.info("Hashmap to partitioned PairRDD: " + hashMapPairRdd.collect());
+		logger.info("Hashmap partitions: " + hashMapPairRdd.partitions().size());
 	}
 }
