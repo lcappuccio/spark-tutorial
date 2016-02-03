@@ -1,14 +1,11 @@
 package org.systemexception.sparktutorial;
 
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.Text;
 import org.apache.spark.HashPartitioner;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
-import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.storage.StorageLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,15 +98,5 @@ public class Main {
 				.partitionBy(new HashPartitioner(100)).persist(StorageLevel.MEMORY_ONLY());
 		logger.info("Hashmap to partitioned PairRDD: " + hashMapPairRdd.collect());
 		logger.info("Hashmap partitions: " + hashMapPairRdd.partitions().size());
-
-		// Will fail but leave as an example
-		logger.info("SequenceFile to PairRDD");
-		JavaPairRDD<Text, IntWritable> hadoopData = sc.sequenceFile("filePath", Text.class, IntWritable.class);
-		JavaPairRDD<String, Integer> hadoopDataConverted = hadoopData.mapToPair(
-				(PairFunction<Tuple2<Text, IntWritable>, String, Integer>) textIntWritableTuple2 ->
-						new Tuple2<String, Integer>(textIntWritableTuple2._1.toString()
-								, textIntWritableTuple2._2.get()));
-		logger.info("SequenceFile to PairRDD: " + hadoopDataConverted.collect());
-
 	}
 }

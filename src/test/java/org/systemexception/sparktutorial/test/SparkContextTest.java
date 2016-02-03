@@ -94,6 +94,33 @@ public class SparkContextTest {
 		assertTrue("[aaaa]".equals(output));
 	}
 
+	@Test
+	public void sut_load_sequence_file() throws Exception {
+		URL url = this.getClass().getResource("/sequence-test-file-0");
+		File testFile = new File(url.getFile());
+
+		assertTrue(testFile.exists());
+
+		String test_output_folder = "target" + File.separator + convertTime(System.currentTimeMillis())
+				+ "_sequence_output_0";
+		sut.sequenceFile(testFile.getAbsolutePath(), test_output_folder);
+		String output = Arrays.toString(readOutputFile(test_output_folder).toArray());
+		assertTrue(new File(test_output_folder).exists());
+		assertTrue("[(Red,5)]".equals(output));
+
+		url = this.getClass().getResource("/sequence-test-file-1");
+		testFile = new File(url.getFile());
+
+		assertTrue(testFile.exists());
+
+		test_output_folder = "target" + File.separator + convertTime(System.currentTimeMillis())
+				+ "_sequence_output_1";
+		sut.sequenceFile(testFile.getAbsolutePath(), test_output_folder);
+		output = Arrays.toString(readOutputFile(test_output_folder).toArray());
+		assertTrue(new File(test_output_folder).exists());
+		assertTrue("[(Green,0), (Blue,20)]".equals(output));
+	}
+
 	private String convertTime(long time) {
 		Date date = new Date(time);
 		Format format = new SimpleDateFormat("yyyyMMddHHmmss");
