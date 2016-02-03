@@ -1,11 +1,14 @@
 package org.systemexception.sparktutorial;
 
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.spark.HashPartitioner;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
+import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.storage.StorageLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,16 +33,16 @@ public class Main {
 		JavaSparkContext sc = sparkContext.getSparkContext();
 
 		logger.info("Parallelize list of integers");
-		JavaRDD<Integer> ints = sc.parallelize(Arrays.asList(1,2,3,4));
+		JavaRDD<Integer> ints = sc.parallelize(Arrays.asList(1, 2, 3, 4));
 		JavaRDD<Integer> result = ints.map(x -> x * x);
-		for (Integer integer: result.collect()) {
+		for (Integer integer : result.collect()) {
 			logger.info("Item: " + integer);
 		}
 
 		logger.info("Parallelize Strings");
 		JavaRDD<String> strings = sc.parallelize(Arrays.asList("Hello World", "Goodbye World"));
 		JavaRDD<String> words = strings.flatMap(x -> Arrays.asList(x.split(" ")));
-		for (String word: words.collect()) {
+		for (String word : words.collect()) {
 			logger.info("Words: " + word);
 		}
 
@@ -48,8 +51,8 @@ public class Main {
 		logger.info("Reduced: " + reduced);
 
 		logger.info("Map to pair");
-		JavaPairRDD<Long, String> pairRDD = sc.parallelizePairs(Arrays.asList(
-				new Tuple2(1,"Hello World"), new Tuple2(2,"Goodbye World")));
+		JavaPairRDD<Long, String> pairRDD = sc.parallelizePairs(Arrays.asList(new Tuple2(1, "Hello World")
+				, new Tuple2(2, "Goodbye World")));
 		logger.info("Paired: " + pairRDD.collect());
 		JavaPairRDD<Long, String> filteredPairRDD = pairRDD.filter(t -> t._2.contains("Hello"));
 		logger.info("Paired filtered: " + filteredPairRDD.collect());
@@ -64,8 +67,8 @@ public class Main {
 		logger.info("Paired and mapped: " + simpsonsMapValued.collect());
 		logger.info("Reduce by key");
 		JavaPairRDD<String, Tuple2<Long, Long>> simponsMapReduced = simpsonsMapValued.reduceByKey(
-				(Function2<Tuple2<Long, Long>, Tuple2<Long, Long>, Tuple2<Long, Long>>) (longLongTupleX, longLongTupleY)
-						-> new Tuple2<>(longLongTupleX._1 + longLongTupleY._1, longLongTupleX._2 + longLongTupleY._2)
+				(Function2<Tuple2<Long, Long>, Tuple2<Long, Long>, Tuple2<Long, Long>>) (longTupleX, longTupleY)
+						-> new Tuple2<>(longTupleX._1 + longTupleY._1, longTupleX._2 + longTupleY._2)
 		);
 		logger.info("Reduced by key: " + simponsMapReduced.collect());
 
@@ -82,7 +85,8 @@ public class Main {
 		logger.info("Customer left join purchases: " + customerLeftOuterPurchases.collect());
 
 		JavaPairRDD unsortedData = sc.parallelizePairs(Arrays.asList(
-				new Tuple2("D","Data4"), new Tuple2("A", "Data1"), new Tuple2("C", "Data3"), new Tuple2("B", "Data2")));
+				new Tuple2("D", "Data4"), new Tuple2("A", "Data1"), new Tuple2("C", "Data3"),
+				new Tuple2("B", "Data2")));
 		logger.info("Unsorted data: " + unsortedData.collect());
 		JavaPairRDD sortedData = unsortedData.sortByKey();
 		logger.info("Sorted data: " + sortedData.collect());
@@ -97,5 +101,14 @@ public class Main {
 				.partitionBy(new HashPartitioner(100)).persist(StorageLevel.MEMORY_ONLY());
 		logger.info("Hashmap to partitioned PairRDD: " + hashMapPairRdd.collect());
 		logger.info("Hashmap partitions: " + hashMapPairRdd.partitions().size());
+
+		// Will fail but leave as an example
+		JavaPairRDD<Text, IntWritable> hadoopData = sc.sequenceFile("filePath", Text.class, IntWritable.class);
+		JavaPairRDD<String, Integer> hadoopDataConverted = hadoopData.mapToPair(
+				(PairFunction<Tuple2<Text, IntWritable>, String, Integer>) textIntWritableTuple2 ->
+						new Tuple2<String, Integer>(textIntWritableTuple2._1.toString()
+								, textIntWritableTuple2._2.get()));
+		logger.info("SequenceFile to Pair RDD: " + hadoopDataConverted.collect());
+
 	}
 }
