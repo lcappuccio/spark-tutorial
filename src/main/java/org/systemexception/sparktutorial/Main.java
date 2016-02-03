@@ -103,12 +103,13 @@ public class Main {
 		logger.info("Hashmap partitions: " + hashMapPairRdd.partitions().size());
 
 		// Will fail but leave as an example
+		logger.info("SequenceFile to PairRDD");
 		JavaPairRDD<Text, IntWritable> hadoopData = sc.sequenceFile("filePath", Text.class, IntWritable.class);
 		JavaPairRDD<String, Integer> hadoopDataConverted = hadoopData.mapToPair(
 				(PairFunction<Tuple2<Text, IntWritable>, String, Integer>) textIntWritableTuple2 ->
 						new Tuple2<String, Integer>(textIntWritableTuple2._1.toString()
 								, textIntWritableTuple2._2.get()));
-		logger.info("SequenceFile to Pair RDD: " + hadoopDataConverted.collect());
+		logger.info("SequenceFile to PairRDD: " + hadoopDataConverted.collect());
 
 	}
 }
