@@ -1,10 +1,17 @@
 package org.systemexception.sparktutorial.pojo;
 
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.SQLContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
 import java.util.ArrayList;
@@ -17,6 +24,7 @@ import java.util.List;
  */
 public class SparkContext {
 
+	private static final Logger logger = LoggerFactory.getLogger(SparkContext.class);
 	private final JavaSparkContext sparkContext;
 
 	public SparkContext() {
@@ -63,5 +71,23 @@ public class SparkContext {
 		JavaRDD<String> input = sparkContext.textFile(fileName);
 		JavaRDD<String> filteredLines = input.filter(s -> s.contains(textToFilter));
 		filteredLines.saveAsTextFile(outputFolder);
+	}
+
+	public void sequenceFile(String fileName, String outputFolder) {
+		// Will fail but leave as an example
+		JavaPairRDD<Text, IntWritable> hadoopData = sparkContext.sequenceFile(fileName, Text.class, IntWritable.class);
+		JavaPairRDD<String, Integer> hadoopDataConverted = hadoopData.mapToPair(
+				(PairFunction<Tuple2<Text, IntWritable>, String, Integer>) textIntWritableTuple2 ->
+						new Tuple2<String, Integer>(textIntWritableTuple2._1.toString()
+								, textIntWritableTuple2._2.get()));
+		hadoopDataConverted.saveAsTextFile(outputFolder);
+	}
+
+	public void loadJson(String fileName, String outputFolder) {
+		logger.info("Load JSON file");
+		SQLContext sqlContext = new SQLContext(sparkContext);
+		DataFrame data = sqlContext.read().json(fileName);
+		JavaRDD dataRdd = data.toJavaRDD();
+		dataRdd.saveAsTextFile(outputFolder);
 	}
 }
