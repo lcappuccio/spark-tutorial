@@ -136,6 +136,19 @@ public class SparkContextTest {
 		assertTrue(output.contains("[[000,John]]"));
 	}
 
+	@Test
+	public void count_blank_lines() throws Exception {
+		URL url = this.getClass().getResource("/uuid-list.txt");
+		File testFile = new File(url.getFile());
+
+		assertTrue(testFile.exists());
+
+		String test_output_folder = "target" + File.separator + convertTime(System.currentTimeMillis()) +
+				"_accumulator";
+		int blanksCounted = sut.countBlanksAccumulator(testFile.getAbsolutePath(), test_output_folder);
+		assertTrue(5 == blanksCounted);
+	}
+
 	private String convertTime(long time) {
 		Date date = new Date(time);
 		Format format = new SimpleDateFormat("yyyyMMddHHmmss");
