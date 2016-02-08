@@ -8,6 +8,8 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.SQLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
@@ -79,5 +81,13 @@ public class SparkContext {
 						new Tuple2<String, Integer>(textIntWritableTuple2._1.toString()
 								, textIntWritableTuple2._2.get()));
 		hadoopDataConverted.saveAsTextFile(outputFolder);
+	}
+
+	public void loadJson(String fileName, String outputFolder) {
+		logger.info("Load JSON file");
+		SQLContext sqlContext = new SQLContext(sparkContext);
+		DataFrame data = sqlContext.read().json(fileName);
+		JavaRDD dataRdd = data.toJavaRDD();
+		dataRdd.saveAsTextFile(outputFolder);
 	}
 }

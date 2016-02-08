@@ -121,6 +121,21 @@ public class SparkContextTest {
 		assertTrue("[(Green,0), (Blue,20)]".equals(output));
 	}
 
+	@Test
+	public void load_json_file() throws Exception {
+		URL url = this.getClass().getResource("/example.json");
+		File testFile = new File(url.getFile());
+
+		assertTrue(testFile.exists());
+
+		String test_output_folder = "target" + File.separator + convertTime(System.currentTimeMillis()) + "_json_load";
+		sut.loadJson(testFile.getAbsolutePath(), test_output_folder);
+		String output = Arrays.toString(readOutputFile(test_output_folder).toArray());
+
+		assertTrue(new File(test_output_folder).exists());
+		assertTrue(output.contains("[[000,John]]"));
+	}
+
 	private String convertTime(long time) {
 		Date date = new Date(time);
 		Format format = new SimpleDateFormat("yyyyMMddHHmmss");
