@@ -99,7 +99,7 @@ public class SparkContext {
 		final Accumulator<Integer> blanksCounter = sparkContext.accumulator(0);
 		JavaRDD<String> fileMap = file.flatMap(
 				(FlatMapFunction<String, String>) line -> {
-					if (line.equals("")) {
+					if (("").equals(line)) {
 						blanksCounter.add(1);
 					}
 					return Arrays.asList(line.split(" "));
