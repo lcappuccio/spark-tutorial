@@ -3,10 +3,12 @@ package org.systemexception.sparktutorial.pojo;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.spark.Accumulator;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.SQLContext;
@@ -25,7 +27,7 @@ import java.util.List;
 public class SparkContext {
 
 	private static final Logger logger = LoggerFactory.getLogger(SparkContext.class);
-	private final JavaSparkContext sparkContext;
+	private transient final JavaSparkContext sparkContext;
 
 	public SparkContext() {
 		SparkConf sparkConf = new SparkConf().setAppName("org.systemexception.sparktutorial").setMaster("local");
@@ -56,8 +58,8 @@ public class SparkContext {
 		JavaRDD<String> input = sparkContext.textFile(fileName);
 		List<String> fileContent = input.collect();
 		List<String> stringBuffer = new ArrayList<>();
-		for (String fileLine: fileContent) {
-			for (char fileChar: fileLine.toCharArray()) {
+		for (String fileLine : fileContent) {
+			for (char fileChar : fileLine.toCharArray()) {
 				stringBuffer.add(String.valueOf(fileChar));
 			}
 		}
@@ -89,5 +91,20 @@ public class SparkContext {
 		DataFrame data = sqlContext.read().json(fileName);
 		JavaRDD dataRdd = data.toJavaRDD();
 		dataRdd.saveAsTextFile(outputFolder);
+	}
+
+	public int countBlanksAccumulator(String fileName, String outputFolder) {
+		logger.info("Generate accumulator for blank lines in uuid-list.txt");
+		JavaRDD<String> file = sparkContext.textFile(fileName);
+		final Accumulator<Integer> blanksCounter = sparkContext.accumulator(0);
+		JavaRDD<String> fileMap = file.flatMap(
+				(FlatMapFunction<String, String>) line -> {
+					if (("").equals(line)) {
+						blanksCounter.add(1);
+					}
+					return Arrays.asList(line.split(" "));
+				});
+		fileMap.saveAsTextFile(outputFolder);
+		return blanksCounter.value();
 	}
 }
