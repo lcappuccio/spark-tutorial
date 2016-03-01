@@ -98,5 +98,7 @@ public class Main {
 				.partitionBy(new HashPartitioner(100)).persist(StorageLevel.MEMORY_ONLY());
 		logger.info("Hashmap to partitioned PairRDD: " + hashMapPairRdd.collect());
 		logger.info("Hashmap partitions: " + hashMapPairRdd.partitions().size());
+
+		sparkContext.getSparkContext().close();
 	}
 }
